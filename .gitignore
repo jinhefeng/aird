@@ -1,0 +1,50 @@
+# --- 依赖与构建 (Dependencies & Build) ---
+node_modules/
+dist/
+lib/
+*.tsbuildinfo
+
+# --- 日志与调试 (Logs & Debugging) ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.vitest.result.json
+
+# --- 测试与覆盖率 (Testing & Coverage) ---
+coverage/
+*.lcov
+
+# --- 环境与敏感信息 (Environment & Secrets) ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+
+# --- 操作系统与 IDE (OS & IDEs) ---
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# --- 临时文件 (Temp) ---
+.tmp/
+.temp/
+.cache/
+.nyc_output/
+
+# --- Aird 演示与临时导出 (Project Specific) ---
+docs/demo/export/
+# 如果后续有 AI 自动生成的本地预览，可以排除
+.aird-preview/

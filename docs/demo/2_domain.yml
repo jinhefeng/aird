@@ -1,0 +1,30 @@
+# Aird Domain Model Definition (v1.0)
+
+Context: KnowledgeGraph
+AggregateRoot: RequirementNode
+
+Entities:
+  - name: RequirementNode
+    attributes:
+      - id: UUID (PK)
+      - title: String (Size: 5-100)
+      - status: Enum [DRAFT, READY_FOR_DESIGN, CLOSED]
+      - current_revision: Integer (Default: 1)
+      - owner_id: UUID
+    associations:
+      - type: has_many
+        target: RequirementRevision
+
+  - name: RequirementRevision
+    attributes:
+      - id: UUID (PK)
+      - node_id: UUID (FK)
+      - version_num: Integer
+      - content: Text (Markdown)
+      - editor_id: UUID
+      - created_at: DateTime
+      - summary: String (Commit message for doc)
+
+DomainEvents:
+  - NodeCreated: (node_id, owner_id)
+  - RevisionAdded: (node_id, version_num, editor_id)

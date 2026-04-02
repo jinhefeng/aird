@@ -1,0 +1,113 @@
+openapi: 3.0.3
+info:
+  title: Aird Core Platform API
+  description: 核心研发知识图谱管理 API，支持需求-模型-契约-测试-代码的全生命周期追踪。
+  version: 0.1.0
+
+servers:
+  - url: http://api.aird.io/v1
+
+paths:
+  /workspaces/{workspaceId}/projects:
+    post:
+      summary: 初始化一个新的研发项目
+      tags: [Project]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, repositoryUrl]
+              properties:
+                name: { type: string, minLength: 2, maxLength: 50 }
+                repositoryUrl: { type: string, format: uri }
+      responses:
+        '201':
+          description: 项目初始化成功
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Project' }
+
+  /projects/{projectId}/nodes:
+    post:
+      summary: 提交一个新的知识节点（PRD, Model, Spec 等）
+      tags: [KnowledgeGraph]
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, name, content]
+              properties:
+                type: { enum: [REQUIREMENT, MODEL, CONTRACT, TEST, CODE] }
+                name: { type: string }
+                content: { type: string, description: "节点的内容或引用指针" }
+                parentIds:
+                  type: array
+                  items: { type: string, format: uuid }
+                  description: "该节点派生自哪些父节点"
+      responses:
+        '201':
+          description: 节点创建成功
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KnowledgeNode' }
+
+  /nodes/{nodeId}/impact-analysis:
+    get:
+      summary: 分析该节点变更对下游的影响半径 (Impact Radius)
+      tags: [KnowledgeGraph]
+      parameters:
+        - name: nodeId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: 返回受影响的节点列表及其严重程度
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  impactedNodes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nodeId: { type: string, format: uuid }
+                        nodeName: { type: string }
+                        impactLevel: { enum: [LOW, MEDIUM, HIGH, CRITICAL] }
+                        relationPath: { type: string, description: "影响链条路径" }
+
+components:
+  schemas:
+    Project:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        workspaceId: { type: string, format: uuid }
+        name: { type: string }
+        repositoryUrl: { type: string }
+
+    KnowledgeNode:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        projectId: { type: string, format: uuid }
+        type: { type: string }
+        name: { type: string }
+        status: { type: string }
+        currentVersion: { type: string }

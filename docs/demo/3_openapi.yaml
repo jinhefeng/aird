@@ -1,0 +1,36 @@
+openapi: 3.0.0
+info:
+  title: Aird Knowledge Graph Node API
+  version: 1.0.0
+
+paths:
+  /v1/nodes:
+    post:
+      summary: Create a new Requirement Node
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string, minLength: 5, maxLength: 100 }
+                content: { type: string, format: markdown }
+                ownerId: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeResponse'
+
+components:
+  schemas:
+    NodeResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        currentRevision: { type: integer }
+        status: { type: string }

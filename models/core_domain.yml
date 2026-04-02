@@ -1,0 +1,45 @@
+# Aird Core Meta-Model (v0.1)
+# 描述 Aird 如何存储和管理自身的研发资产
+
+Context: AirdPlatform
+AggregateRoot: Workspace
+
+Entities:
+  - name: Workspace
+    description: 团队的顶层隔离单元（如：阿里、腾讯或某个独立组织）
+    attributes:
+      - id: UUID (PK)
+      - name: String
+      - subscription_plan: Enum [FREE, PRO, ENTERPRISE]
+
+  - name: Project
+    description: 归属于 Workspace 的具体研发项目
+    attributes:
+      - id: UUID (PK)
+      - workspace_id: UUID (FK)
+      - name: String
+      - repository_url: String (Git URL)
+
+  - name: KnowledgeNode
+    description: 研发知识图谱中的原子节点（如 PRD, Model, Spec, Test）
+    attributes:
+      - id: UUID (PK)
+      - project_id: UUID (FK)
+      - type: Enum [REQUIREMENT, MODEL, CONTRACT, TEST, CODE]
+      - name: String
+      - status: Enum [DRAFT, REVIEWING, APPROVED, DEPRECATED]
+      - current_version: String
+      - content_ref: String (存储在 S3 或 Git 中的内容指针)
+
+  - name: DependencyEdge
+    description: 节点之间的追踪与影响关系
+    attributes:
+      - id: UUID (PK)
+      - from_node_id: UUID (FK)
+      - to_node_id: UUID (FK)
+      - relation_type: Enum [DERIVES_FROM, DEPENDS_ON, VERIFIES, IMPLEMENTS]
+
+DomainEvents:
+  - ProjectInitialized: (project_id, workspace_id)
+  - NodeChanged: (node_id, old_version, new_version)
+  - ImpactDetected: (edge_id, severity)
